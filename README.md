@@ -4,3 +4,7 @@
 ```
 /accordion
 手风琴
+
+```
+/circle-percent
+annular-percent: 环形百分比
