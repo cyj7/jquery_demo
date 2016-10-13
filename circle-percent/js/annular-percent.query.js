@@ -43,20 +43,26 @@
         }
     }
     $.fn.annularPencent = function(opt){
-        var annular = new annularPencent(this, opt);
-        var setIntervalFn = null;
-        var deg = 0;
-        var endDeg = opt.percent * 1;
-        endDeg = endDeg ? endDeg*360 : 360;
-        setIntervalFn = setInterval(function(){
-            deg += 2;
-            if(deg >= endDeg){
-                clearInterval(setIntervalFn)
-            }
-            annular.drawing(deg);
-        },1)
-        // annular.drawing(endDeg);
-        // console.log(111)
+        var thisLen = this.length;
+        function newFn(element) {
+            var annular = new annularPencent(element, opt);
+            var setIntervalFn = null;
+            var deg = 0;
+            // var endDeg = opt.percent * 1;
+            var endDeg = element.data('percent') * 1;
+            endDeg = endDeg ? endDeg*360 : 360;
+            setIntervalFn = setInterval(function(){
+                deg += 2;
+                if(deg >= endDeg){
+                    clearInterval(setIntervalFn)
+                }
+                annular.drawing(deg);
+            },1)
+            annular.drawing(endDeg);
+        }
+        for(var i=0; i <thisLen; i++){
+            newFn(this.eq(i));
+        }
         return this
     }
 }(jQuery));
