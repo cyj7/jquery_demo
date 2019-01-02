@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>框选js</title>
+	<style>
+		*{ margin: 0; padding: 0; box-sizing: border-box; }
+		table{ border-collapse: collapse; border-spacing: 0; }
+		td{ }
+		/*时段 选择*/
+		.period-time{ margin: 10px auto; width: 880px; font-size: 14px; position: relative; }
+		.period-time table td{ border: 1px solid #ddd; width: 17px; text-align: center; padding: 5px 0; vertical-align: middle; }
+		.period-time .td_week{ min-width: 80px; }
+		.period-time .table-mark{ position: absolute; background: #649dc1; opacity: .5; border: 1px dashed #649dc1; }
+
+		.time-slot-box{ width: 100%; }
+		.time-slot-box tr:nth-child(2n){ background: #f8f8f8; }
+		.time-slot-box .hour-td.active{ background: #fff2ec; }
+	</style>
+</head>
+<body style="height: 1000px;">
+	<div class="select-area period-time" style="margin-top: 600px;">
+		
+	</div>
+    <script type="text/javascript" src="../common/jquery-3.1.0.min.js"></script>
+	<script src="./js/time-slot.js"></script>
+	<script>
+		//投放时段
+$(".select-area").timeSlot({
+	selectId: [{'week': 2, 'time': [0,5]}]
+},function(res){
+	console.log(res,'===res')
+});
+	</script>
+</body>
+</html>
