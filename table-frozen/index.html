@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>table左侧固定</title>
+	<style>
+		*{ margin: 0; padding: 0; font-size: 14px; }
+		a{ text-decoration: none; }
+		table, table td, table th, table tr{ border-collapse: collapse; }
+		/*table tr{ border: 1px solid #ddd; }*/
+		table.list-table{ width: 100%; }
+		.list-table th, .list-table td{ text-align: center; word-break: break-all; vertical-align: middle; }
+		.list-table thead tr{ background: #e5e8ec; overflow: hidden; }
+		.list-table thead th, .list-table td{ line-height: 24px; padding: 8px 0; }
+		.list-table .ads-table-cell{ border-left: 1px solid #fff; }
+		.list-table th:first-child .ads-table-cell{ border-left: 0; }
+		.list-table .ads-table-cell{ padding: 0 5px; }
+		.list-table tr:nth-child(2n){ background: #f8f9fa; }
+		.ads-body{ overflow-y: hidden; overflow-x: auto; position: relative; }
+		.ads-body .alt-box{ transform: translateX(-50%); width: auto; white-space:nowrap; }
+		.ads-body .ads-name{ text-align: left; width: 240px !important; }
+		.ads-body .ads-body-main .ads-table-body{ overflow: auto; height: 400px; }
+		.ads-body .ads-table-body tr{ border-bottom: 1px solid #ddd; }
+		.ads-body-lft{ position: absolute; top: 0; left: 0; z-index: 1; background: #fff; }
+		.ads-body-lft table{ width: 100%; }
+		/*.ads-body-lft th{ height: 40px; }*/
+		.ads-body-lft .ads-table-body{ overflow: hidden; }
+		.ads-body-lft .ads-table-header{ position: relative; z-index: 2; }
+		.ads-body-lft.lft-show{ box-shadow: 2px 0 5px rgba(0,0,0,.2); }
+
+	</style>
+</head>
+<body>
+<div class="ads-body">
+	<div class="ads-body-main">
+		<div class="ads-table-header">
+			<table class="list-table">
+				<colgroup>
+			        <col style="width: 40px;">
+			        <col style="width: 240px;">
+			        <col style="width: 170px;">
+			        <col style="width: 170px;">
+			        <col style="width: 170px;">
+			        <col style="width: 170px;">
+			        <col style="width: 170px;">
+			        <col style="width: 170px;">
+			        <col style="width: 170px;">
+			        <col style="width: 170px;">
+			        <col style="width: 180px;">
+			    </colgroup>
+			    <thead>
+			    	<tr>
+						<th><div class="ads-table-cell"><input type="checkbox" class="chk-all"></div></th>
+						<th><div class="ads-table-cell ads-name">计划名称</div></th>
+						<th><div class="ads-table-cell">曝光量</div></th>
+						<th><div class="ads-table-cell">点击量</div></th>
+						<th><div class="ads-table-cell">点击率</div></th>
+						<th><div class="ads-table-cell">花费</div></th>
+						<th><div class="ads-table-cell">下载率</div></th>
+						<th><div class="ads-table-cell">下载量</div></th>
+						<th>
+							<div class="ads-table-cell">
+								<span class="overview-tit">状态</span>
+							</div>
+						</th>
+						<th>
+							<div class="ads-table-cell">
+								<span class="overview-tit">投放开关</span>
+							</div>
+						</th>
+						<th>
+							<div class="ads-table-cell">
+								<span class="overview-tit">操作</span>
+							</div>
+						</th>
+			    	</tr>
+				</thead>
+			</table>
+		</div>
+		<div class="ads-table-body">
+			<table class="list-table">
+				<colgroup>
+			        <col style="width: 40px;">
+			        <col style="width: 240px;">
+			        <col style="width: 170px;">
+			        <col style="width: 170px;">
+			        <col style="width: 170px;">
+			        <col style="width: 170px;">
+			        <col style="width: 170px;">
+			        <col style="width: 170px;">
+			        <col style="width: 170px;">
+			        <col style="width: 170px;">
+			        <col style="width: 180px;">
+			    </colgroup>
+			    <tbody>
+			    	<tr>
+			    		<td><div class="ads-table-cell"> </div></td>
+			    		<td><div class="ads-table-cell ads-name">整体数据</div></td>
+			    		<td><div class="ads-table-cell main-color">697983</div></td>
+			    		<td><div class="ads-table-cell main-color">11345</div></td>
+			    		<td><div class="ads-table-cell main-color">1.63%</div></td>
+			    		<td><div class="ads-table-cell main-color">2105.70</div></td>
+			    		<td><div class="ads-table-cell main-color">0.05%</div></td>
+			    		<td><div class="ads-table-cell main-color">338</div></td>
+			    		<td></td>
+			    		<td></td>
+			    		<td></td>
+			    	</tr>
+			    	<tr style="height: 40px;">
+			    		<td><div class="ads-table-cell"><input type="checkbox" class="chk-item" value="1"></div></td>
+			    		<td><div class="ads-table-cell ads-name"><a href="#" class="blue-color">米盟-横幅-cpc 1021627f</a></div></td>
+			    		<td><div class="ads-table-cell">609020</div></td>
+			    		<td><div class="ads-table-cell">11345</div></td>
+			    		<td><div class="ads-table-cell">1.63%</div></td>
+			    		<td><div class="ads-table-cell">2105.70</div></td>
+			    		<td><div class="ads-table-cell">0.05%</div></td>
+			    		<td><div class="ads-table-cell">338</div></td>
+			    		<td><div class="ads-table-cell">暂停中</div></td>
+			    		<td><div class="ads-table-cell"><span class="switch-box"><i class="switch-circle"></i></span></div></td>
+			    		<td><div class="ads-table-cell main-color">
+			    			<a href="javascript:;" class="m-r-5">编辑</a>
+			    			<a href="javascript:;" class="m-r-5">删除</a>
+			    			<a href="javascript:;" class="m-r-5">创建广告组</a>
+			    		</div></td>
+			    	</tr>
+			    </tbody>
+			</table>
+		</div>
+	</div>
+</div>
+	<script type="text/javascript" src="../common/jquery-3.1.0.min.js"></script>
+	<script type="text/javascript" src="./js/table-frozen.js"></script>
+	<script>
+		window.onload = function() { 
+			$("div.ads-body-main").tableFrozen();
+		}
+		// $(document).ready(function(){
+		// 	$("div.ads-body-main").tableFrozen();
+		// })
+		
+	</script>
+</body>
+</html>
