@@ -252,7 +252,7 @@ selectArea.prototype.clearAll = function(){ //清空
 selectArea.prototype.setNumFn = function(num){ //已选 数字
 	num = num || this.cfg.selectNum.length;
 	
-	if(num > parseInt(this.cfg.max)){
+	if(num > parseInt(this.cfg.max) && (this.cfg.max != 0 || this.cfg.max != "")){
 		alert("最多可选"+this.cfg.max+"个");
 		return false;
 	}

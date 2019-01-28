@@ -26,3 +26,8 @@ annular-percent: 环形百分比
 /checked-more
 checkbox多级选择
 ```
+
+```
+/datepicker/datepickerZip
+jquery 时间选择插件（下载的）
+```

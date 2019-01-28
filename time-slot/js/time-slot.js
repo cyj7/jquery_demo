@@ -69,9 +69,10 @@ timeSlotFn.prototype.initData = function($table){ //数据 初始化
 		if(times.length <= 0) return;
 		for(var j=0; j<times.length; j++){
 			// $table.find("tr").eq(week).find("td").eq(parseInt(times[j])+1).addClass("active");
-			this.selectFn($table.find("tr").eq(week).find("td").eq(parseInt(times[j])+1));
+			this.selectFn($table.find("tr").eq(week+2).find("td").eq(parseInt(times[j])+1));
 		}
 	}
+	this.callback && this.callback(this.selectTime, this.dom);
 }	
 
 timeSlotFn.prototype.clearAll = function(){
@@ -129,15 +130,16 @@ timeSlotFn.prototype.addSelectVal = function(obj){ //添加 选择项
 	obj.addClass(this.cfg.activeClass);
 	this.selectTime[day].week = day;
 	this.selectTime[day].time.push(idx);
+	// this.callback && this.callback(this.selectTime, this.dom);
 }
 timeSlotFn.prototype.deleteSelectVal = function(obj){ //删除 选择项
 	var day = obj.data("day"); //星期
 	var idx = obj.data("idx"); //时段
 	var inx = this.selectTime[day].time.indexOf(idx);
-
 	if(inx < 0) return;
 	obj.removeClass(this.cfg.activeClass);
 	this.selectTime[day].time.splice(inx, 1);
+	// this.callback && this.callback(this.selectTime, this.dom);
 }
 timeSlotFn.prototype.selectFn = function(obj){ //设置值
 	if(obj.hasClass(this.cfg.activeClass)){
