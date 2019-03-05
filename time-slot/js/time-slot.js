@@ -66,7 +66,7 @@ timeSlotFn.prototype.initData = function($table){ //数据 初始化
 	for(var i=0; i<selects.length; i++){
 		var times = selects[i].time;
 		var week = parseInt(selects[i].week);
-		if(times.length <= 0) return;
+		if(times.length <= 0) continue;
 		for(var j=0; j<times.length; j++){
 			// $table.find("tr").eq(week).find("td").eq(parseInt(times[j])+1).addClass("active");
 			this.selectFn($table.find("tr").eq(week+2).find("td").eq(parseInt(times[j])+1));

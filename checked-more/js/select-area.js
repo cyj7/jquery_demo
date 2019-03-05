@@ -46,8 +46,10 @@ selectArea.prototype.setSkinChildLft = function(item){
 }
 
 selectArea.prototype.setSkinLft = function(data, searchVal){ //绑定数据 右侧
+	
+
 	this.dom.addClass("option-select-main"); //添加class
-	var lftDom = $('<div class="option-select-lft">'+
+	var lftDom = $('<div class="option-select-lft option-select-data">'+
 						'<div class="option-search"><input type="text" placeholder="搜索" class="input" value="'+ (searchVal || '') +'"><a href="javascript:;" class="index-icon-box icon-search search-btn"></a></div>'+
 					'</div>');
 	var lftListDom = $('<ul class="option-list"></ul>');
@@ -64,8 +66,12 @@ selectArea.prototype.setSkinLft = function(data, searchVal){ //绑定数据 右�
 	}
 }
 selectArea.prototype.setSkinRht = function(){ //绑定数据 左侧
-	var rhtDom = '<div class="option-select-lft">'+
-					'<div class="option-search clearfix">可选'+ this.cfg.max +'个,已选择<span id="selectNum">'+ this.cfg.selectNum.length +'</span>个<a href="javascript:;" class="clear-dom f-r">清空</a></div>'+
+	var maxTxt = "";
+	if(this.cfg.max != "" || this.cfg.max > 0){
+		maxTxt = '可选'+ this.cfg.max +'个,';
+	}
+	var rhtDom = '<div class="option-select-lft option-selected">'+
+					'<div class="option-search clearfix">'+ maxTxt +'已选择<span id="selectNum">'+ this.cfg.selectNum.length +'</span>个<a href="javascript:;" class="clear-dom f-r">清空</a></div>'+
 					'<ul class="option-selected-arr"></ul>'+
 				'</div>';
 	this.dom.append(rhtDom);
@@ -89,11 +95,15 @@ selectArea.prototype.initFn = function(){ //编辑 初始化
 }
 
 selectArea.prototype.setSkin = function(){
+	var selectDom = this.dom.find(".option-select-lft");
+	if(selectDom.length > 0){
+		selectDom.remove();
+	}
+	
 	this.setSkinLft(this.cfg.data);
 	this.setSkinRht();
 
 	this.checkTit();
-
 	this.deleteItem(); //删除
 	this.clearAll(); //清空
 	if(this.cfg.selectArr.length > 0){
@@ -103,7 +113,7 @@ selectArea.prototype.setSkin = function(){
 
 selectArea.prototype.checkTit = function(){ //checkbox 
 	var _this = this;
-	this.dom.on("change", ".option-item input[type=checkbox]", function(){ //全选 反选
+	this.dom.off("change").on("change", ".option-item input[type=checkbox]", function(){ //全选 反选
 		var self = $(this),
 			sp = self.parents(".option-item"),
 			sib = sp.siblings(".option-child"),
@@ -134,7 +144,7 @@ selectArea.prototype.checkTit = function(){ //checkbox
 
 		_this.callbackFn(); //回调
 	});
-	this.dom.on("change", ".option-child-item input[type=checkbox]", function(){ //子 选择
+	this.dom.off("change").on("change", ".option-child-item input[type=checkbox]", function(){ //子 选择
 		var self = $(this),
 			sp = self.closest(".option-child"),
 			sibLi = sp.find("li.option-child-item"),
