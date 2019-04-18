@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		*{ margin: 0; padding: 0; font-size: 14px; }
+		input, button{ outline: none; }
+		.clearfix{ zoom: 1; }
+		.clearfix:after{ content: ""; display: block; width: 0; height: 0; clear: both; visibility: hidden; }
+		.left{ float: left; }
+		.right{ float: right; }
+		
+		.checked-move-item{ width: 300px; border: 1px solid #eee; }
+		.move-tit{ padding: 15px 10px; background: #f1f1f1; border-bottom: 1px solid #eee; }
+		.checked-move-item input[type=checkbox]{ margin-right: 5px; vertical-align: -2px; }
+		.move-search{ position: relative; border: 1px solid #eee; height: 40px; line-height: 40px; padding: 0 35px 0 10px; margin: 10px; border-radius: 5px; }
+		.move-search .move-inp{ height: 40px; line-height: 40px; display: block; border: 0; background: none; }
+		.move-search .search-btn{ display: inline-block; width: 16px; height: 16px; background: url("./images/search.png") center center no-repeat; position: absolute; top: 50%; margin-top: -8px; right: 10px; }
+		.move-list{ height: 400px; overflow-y: auto; }
+		.move-list .move-item{ margin: 5px 10px; height: 30px; line-height: 30px; }
+		.move-list .move-lft{ width: 70%; height: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+		.move-handle{ position: relative; height: 100%; margin: 0 10px; }
+		.move-handke-box{ margin-top: 190px; }
+		.move-handle .move-handle-arr{ width: 40px; height: 40px; position: relative; border: 1px solid #eee; border-radius: 5px; background: #f1f1f1; cursor: pointer; }
+		.move-handle .move-handle-arr:before, .move-handle .move-handle-arr:after{ display: inline-block; content: ""; width: 0; height: 0; position: absolute; top: 50%; margin-top: -6px; }
+		.move-handle .move-handle-right:before, .move-handle .move-handle-right:after{ border: 6px dashed transparent; border-left: 6px solid #333; }
+		.move-handle .move-handle-right:before{ border-left-color: #333; left: 18px; }
+		.move-handle .move-handle-right:after{ border-left-color: #f1f1f1; left: 16px; }
+		.move-handle .move-handle-left{ margin-top: 10px; }
+		.move-handle .move-handle-left:before, .move-handle .move-handle-left:after{ border: 6px dashed transparent; border-right: 6px solid #333; }
+		.move-handle .move-handle-left:before{ border-right-color: #333; right: 18px; }
+		.move-handle .move-handle-left:after{ border-right-color: #f1f1f1; right: 16px; }
+		.btn-box{ text-align: right; margin-top: 20px; }
+		.btn{ padding: 0 20px; background: #f47837; color: #fff; height: 35px; line-height: 35px; border: 0; }
+
+	</style>
+</head>
+<body>
+	<div class="checked-move-box clearfix">
+		<div class="checked-move-item left checked-move-lft">
+			<div class="move-tit clearfix">
+				<label class="left"><input type="checkbox" value="all">厂商商品列表</label>
+				<span class="right">10</span>
+			</div>
+			<div class="move-search">
+				<input type="text" placeholder="请输入商品名称" class="move-inp">
+				<span class="search-btn"></span>
+			</div>
+			<div class="move-list">
+				<div class="move-item clearfix">
+					<label class="left move-lft"><input type="checkbox" value="1">罗技G502</label>
+					<span class="right move-rht">￥89</span>
+				</div>
+				<div class="move-item clearfix">
+					<label class="left move-lft"><input type="checkbox" value="2">罗技G502</label>
+					<span class="right move-rht">￥89</span>
+				</div>
+				<div class="move-item clearfix">
+					<label class="left move-lft"><input type="checkbox" value="3">罗技G502</label>
+					<span class="right move-rht">￥89</span>
+				</div>
+				<div class="move-item clearfix">
+					<label class="left move-lft"><input type="checkbox" value="4">罗技G502</label>
+					<span class="right move-rht">￥89</span>
+				</div>
+				<div class="move-item clearfix">
+					<label class="left move-lft"><input type="checkbox" value="5">罗技G502</label>
+					<span class="right move-rht">￥89</span>
+				</div>
+			</div>
+		</div>
+		<div class="move-handle left">
+			<div class="move-handke-box">
+				<div class="move-handle-arr move-handle-right"></div>
+				<div class="move-handle-arr move-handle-left"></div>
+			</div>
+		</div>
+		<div class="checked-move-item left checked-move-rht">
+			<div class="move-tit clearfix">
+				<label class="left"><input type="checkbox" value="all">平台商品列表</label>
+				<span class="right">10</span>
+			</div>
+			<div class="move-search">
+				<input type="text" placeholder="请输入商品名称" class="move-inp">
+				<span class="search-btn"></span>
+			</div>
+			<div class="move-list">
+				<div class="move-item clearfix">
+					<label class="left"><input type="checkbox" value="1">罗技G502</label>
+				</div>
+				<div class="move-item clearfix">
+					<label class="left"><input type="checkbox" value="2">罗技G502</label>
+				</div>
+				<div class="move-item clearfix">
+					<label class="left"><input type="checkbox" value="3">罗技G502</label>
+				</div>
+				<div class="move-item clearfix">
+					<label class="left"><input type="checkbox" value="4">罗技G502</label>
+				</div>
+				<div class="move-item clearfix">
+					<label class="left"><input type="checkbox" value="5">罗技G502</label>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="btn-box">
+		<button class="btn">确定</button>
+	</div>
+	<div id="moveDemo"></div>
+	<script src="../common/jquery-3.1.0.min.js" type="text/javascript"></script>
+	<script src="./js/checked-move.js" type="text/javascript"></script>
+	<script>
+		$("#moveDemo").moveToRht({
+			'data': [
+				{'id': 1, 'title': '罗技G501', 'desc': '￥89'},
+				{'id': 2, 'title': '罗技G502', 'desc': '￥79'},
+				{'id': 3, 'title': '罗技G503', 'desc': '￥80'},
+				{'id': 4, 'title': '罗技G504', 'desc': '￥83'},
+				{'id': 5, 'title': '罗技G505', 'desc': '￥89'},
+				{'id': 6, 'title': '罗技G506', 'desc': '￥89'},
+				{'id': 11, 'title': '罗技G511', 'desc': '￥89'},
+			],
+			'selectedVal': [11],
+			callback: function(res) {
+				console.log(res,'===========');
+			}
+		});
+	</script>
+</body>
+</html>

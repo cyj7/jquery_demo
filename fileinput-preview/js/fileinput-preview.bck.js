@@ -18,10 +18,10 @@ filePreview.prototype.getConfig = function(opt){
 	var cfg = $.extend({
 		'width': 0,
 		'height': 0,
-		'scale': "16:9", //视频比例
+		'scale': "16:9", //视频比例，多个以逗号隔开
 		'sepc': 'jpg,jpeg,png', //当格式是mp4时，才读取scale的值
 		'maxSize': '100', //单位：kB
-		'url': "/oppo/ftp/upload/savePicture", //上传url
+		'url': "", //上传url
 		'close': false, //是否有可删除,默认没有删除按钮
 		'files': '', //文件路径，多个文件以逗号分开，若div与files长度不同，则files显示不全
 		'callback': null //回调函数
@@ -82,7 +82,7 @@ filePreview.prototype.addInputFile = function(){ //input file
 			acceptSpec.push("*."+specArr[i]);
 		}
 	}
-	this.imageFile = $('<input type="file" class="image-file" name="pictureFile" accept="'+acceptSpec.join(",")+'">');
+	this.imageFile = $('<input type="file" class="image-file" name="imageFile" accept="'+acceptSpec.join(",")+'">');
 	this.dom.append(this.imageFile);
 }
 filePreview.prototype.addFileStyle = function(){
@@ -145,7 +145,6 @@ filePreview.prototype.doneFn = function(url){ //上传完成
 filePreview.prototype.fileUploadFn = function(){ //上传图片
 	var self = this,
 		cfg = self.cfg;
-	var imgOk = false;
 	self.imageFile.fileupload({
 		url: cfg.url, //http://192.168.20.2:8887/frontadmanage/idea/saveIdeaImg?csrId=4
 		maxFileSize: cfg.maxSize*1000, //单位：B
@@ -162,47 +161,20 @@ filePreview.prototype.fileUploadFn = function(){ //上传图片
 			if(cfg.sepc.indexOf(type) < 0){
 				return alert("请上传"+cfg.sepc+"格式的文件");
 			}
-			
-			//读取图片数据
-			if(self.fileType != "video"){
-	            var f = data.originalFiles[0];
-	            var reader = new FileReader();
-                imgOk = false;
-	            reader.onload = function(e) {
-	                var datas = e.target.result;
-	                //获取图片真实宽度和高度
-	                var image = new Image();
-	                image.src = datas;
-	                image.onload = function() {
-	                    var width = image.width;//图片宽
-	                    var height = image.height;//图片高
-	                    if (width != cfg.width || height != cfg.height) {
-	                    	alert("请上传宽"+ cfg.width +"px、高" + cfg.height + "px的图片");
-	                    	return;
-	                    }
-	                    imgOk = true;
-	                    data.submit();
-	                };
-	            };
-	            reader.readAsDataURL(f);
-			}
-			if(imgOk){
-				data.submit();
-			}
-			
+
 			//本地测试用 开始
-//			self.doneFn("/frontpage/static/images/close.png"); //
+			self.doneFn("./js/upload/images/close.png"); //
 			//本地测试用 结束
-			
-			
+
+			data.submit();
 		},
 		done: function(e, data){
 			var json = data.result.data;
-			var file_path = json.fileSavePath;
+			var file_path = json.file_upload_path;
 
 			self.doneFn(file_path); //显示已上传的文件
 
-			cfg.callback && cfg.callback(file_path);
+			cfg.callback && cfg.callback();
 
    //          if(json.ret_code == 200){
    //              var file_path = json.file_upload_path;
@@ -228,7 +200,7 @@ filePreview.prototype.editFn = function(){ //编辑
 
 filePreview.prototype.preview = function(){//查看大图
 	var $this = this;
-	this.dom.off("click").on("click", ".preview-fileupload", function(e){
+	this.dom.on("click", ".preview-fileupload", function(e){
 		var _self = $(this);
 		e.stopPropagation(); //阻止冒泡事件
 		e.preventDefault(); //阻止默认事件
@@ -253,11 +225,16 @@ filePreview.prototype.clear = function(){ //删除
 		var $this = $(this),
 			$selfP = $this.parents(".done-box"),
 			$p = $selfP.parents("."+pclass);
+		// console.log(pclass,'=====pclass');
 		e.stopPropagation(); //阻止冒泡事件
 		e.preventDefault(); //阻止默认事件
 		var len = $p.siblings(".file-input-box").length;
+		// if(len == 0){
 		$selfP.siblings(".file-input-style").removeClass("none");
 		$selfP.remove();
+		// }else{
+		// 	$p.remove();
+		// }
 		$selfP.siblings("input.file-name").val("");
 	});
 }
@@ -273,6 +250,8 @@ $.fn.extend({
 				fileArr.push(files);
 			}
 		}
+		
+		// console.log(this.length,'====+++++')
 		this.each(function(i,dom){
 			options.files = fileArr[i];
             return new filePreview($(dom), options);

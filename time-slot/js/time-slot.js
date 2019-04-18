@@ -4,7 +4,7 @@ function timeSlotFn(obj, opt, callback){
 
 	this.cfg = $.extend({
 		'activeClass': "active",
-		'selectId': [] //已选
+		'selectId': '{}' //已选
 	}, opt || {});
 
 
@@ -59,9 +59,29 @@ timeSlotFn.prototype.addHtml = function(obj){
 	this.initData($table);
 	this._event(obj);
 }
+timeSlotFn.prototype.formatData = function(data){
+	var tmp = [];
+	var obj = JSON.parse(data);
+	// for(var i=0; i<data.length; i++){
+	// 	tmp.push({
+	// 		'week': Object.keys(data[i]),
+	// 		'time': data[i][Object.keys(data[i])]
+	// 	});
+	// }
+	for(var key in obj){
+		tmp.push({
+			'week': parseInt(key)-1,
+			'time': obj[key].split(",")
+		})
+	}
+	return tmp;
+}
 
 timeSlotFn.prototype.initData = function($table){ //数据 初始化
 	var selects = this.cfg.selectId;
+	if(selects != {}){
+		selects = this.formatData(selects);
+	}
 	if(selects.length <= 0) return;
 	for(var i=0; i<selects.length; i++){
 		var times = selects[i].time;
@@ -72,7 +92,13 @@ timeSlotFn.prototype.initData = function($table){ //数据 初始化
 			this.selectFn($table.find("tr").eq(week+2).find("td").eq(parseInt(times[j])+1));
 		}
 	}
-	this.callback && this.callback(this.selectTime, this.dom);
+
+	// this.callback && this.callback(this.selectTime, this.dom);
+
+	if(this.callback){
+		var data = this.setBackData(this.selectTime);
+		this.callback(data, this.dom);
+	}
 }	
 
 timeSlotFn.prototype.clearAll = function(){
@@ -91,14 +117,13 @@ timeSlotFn.prototype.getXY = function(x, y){ //获取相对dom的left,top值
 
 	var left = x + screenX - this.domX,
 		top = y + screenY - this.domY;
-	return {'x': left, "y": top}
+	return {'x': left, "y": top};
 }
 
 timeSlotFn.prototype.addMask = function(x, y){ //添加遮罩层
 	var xyNum = this.getXY(x,y);
 	var left = xyNum.x,
 		top = xyNum.y;
-	// console.log(x , this.screenX , this.domX, '====left')
 	var $mask = $('<div style="position: absolute; left: '+ left +'px; top: '+ top +'px; width:0; height: 0; border: 1px dashed #000; background: #3385ff; opacity: .2;"></div>');
 	this.dom.append($mask);
 	return $mask;
@@ -118,12 +143,14 @@ timeSlotFn.prototype.setMask = function(endX, endY){ //设置遮罩层
 	if(h < 0){
 		this.$mask.css({'top': top+"px"});
 	}
-
 	this.$mask.css({'width': Math.abs(w)+"px", 'height': Math.abs(h)+"px"});
 }
 timeSlotFn.prototype.addSelectVal = function(obj){ //添加 选择项
 	var day = obj.data("day"); //星期
 	var idx = obj.data("idx"); //时段
+	if(day == undefined){
+		return false;
+	}
 	if(this.selectTime[day].time.indexOf(idx) > -1){
 		return;
 	}
@@ -149,7 +176,6 @@ timeSlotFn.prototype.selectFn = function(obj){ //设置值
 	}
 }
 timeSlotFn.prototype.allSelectFn = function(arr, bol){ //arr:dom数组， bol:是否是全部选择了
-	// console.log(bol, "allSelectFn1111")
 	for(var i=0; i<arr.length; i++){
 		if(bol){
 			this.deleteSelectVal(arr[i]);
@@ -164,7 +190,6 @@ timeSlotFn.prototype.isAllSelect = function(arr){ //dom数组，是否数组中�
 		curTime = 0;
 	var times = [];
 	var areadyNum = 0; //因存在的数目
-	// console.log(arr, arr.length);
 	for(var i=0; i<arr.length; i++){
 		curDay = arr[i].data("day");
 		curTime = arr[i].data("idx");
@@ -180,6 +205,13 @@ timeSlotFn.prototype.isAllSelect = function(arr){ //dom数组，是否数组中�
 		return false;
 	}
 }
+timeSlotFn.prototype.setBackData = function(data){ //更改格式为[{0:[1,2]},{1:[2,4]}]
+	var tmp = {};
+	for(var i=0; i<data.length; i++){
+		tmp[i+1]= data[i].time.join(",");
+	}
+	return JSON.stringify(tmp);
+}
 
 timeSlotFn.prototype._event = function(obj){
 	var self = this;
@@ -187,7 +219,10 @@ timeSlotFn.prototype._event = function(obj){
 		// self.clearEventBubble(e);
 		var $this = $(this);
 		self.selectFn($this);
-		self.callback && self.callback(self.selectTime, self.dom);
+		if(self.callback){
+			var data = self.setBackData(self.selectTime);
+			self.callback(data, self.dom);
+		}
 	});
 	obj.on("mousedown", function(e){
 		// var $this = $(this);
@@ -218,7 +253,6 @@ timeSlotFn.prototype._event = function(obj){
 		// var $this = $(this);
 		clearTimeout(self.mouseOnFn);
 		self.mouseOn = false;
-		// console.log(self.$mask, '=====');
 		if(!self.$mask) return;
 		var maskLeft = self.$mask.offset().left, //遮罩层
 			maskTop = self.$mask.offset().top,
@@ -255,13 +289,21 @@ timeSlotFn.prototype._event = function(obj){
 		}
 		var isAllBol = self.isAllSelect(selectObj);
 		self.allSelectFn(selectObj, isAllBol);
-		self.callback && self.callback(self.selectTime, self.dom);
+		// self.callback && self.callback(self.selectTime, self.dom);
+		if(self.callback){
+			var data = self.setBackData(self.selectTime);
+			self.callback(data, self.dom);
+		}
 		self.$mask.remove();
 	});
 	obj.on("click", ".clear-all", function(){
 		self.clearAll();
-		self.callback && self.callback(self.selectTime, self.dom);
-	})
+		// self.callback && self.callback(self.selectTime, self.dom);
+		if(self.callback){
+			var data = self.setBackData(self.selectTime);
+			self.callback(data, self.dom);
+		}
+	});
 }
 
 $.fn.extend({

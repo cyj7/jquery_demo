@@ -7,7 +7,7 @@ function selectArea(dom, opt, callback){
 			{'id': 2, 'title': '选择2'}
 		],
 		max: 500, //最多可选
-		selectNum: [], //已选择
+//		selectNum: [], //已选择
 		selectArr: [], //已选择
 	}, opt || {});
 	this.callback = callback;
@@ -33,7 +33,7 @@ selectArea.prototype.setSkinChildLft = function(item){
 	var listItemDom = '<li class="option-child-item">';
 	var itemChild = item.children; //子菜单data
 	if(itemChild){
-		listItemDom += '<p class="option-item"><input type="checkbox" value="'+ item.id +'"><span class="option-txt"><i class="arr-right"></i>'+ item.title +'</span></p><ul class="option-child">';
+		listItemDom += '<p class="option-item"><input type="checkbox" value="'+ item.id +'" class="parent-chk"><span class="option-txt"><i class="arr-right"></i>'+ item.title +'</span></p><ul class="option-child">';
 		for(var j=0; j<itemChild.length; j++){
 			listItemDom += this.setSkinChildLft(itemChild[j]);
 		}
@@ -46,8 +46,6 @@ selectArea.prototype.setSkinChildLft = function(item){
 }
 
 selectArea.prototype.setSkinLft = function(data, searchVal){ //绑定数据 右侧
-	
-
 	this.dom.addClass("option-select-main"); //添加class
 	var lftDom = $('<div class="option-select-lft option-select-data">'+
 						'<div class="option-search"><input type="text" placeholder="搜索" class="input" value="'+ (searchVal || '') +'"><a href="javascript:;" class="index-icon-box icon-search search-btn"></a></div>'+
@@ -61,37 +59,38 @@ selectArea.prototype.setSkinLft = function(data, searchVal){ //绑定数据 右�
 	lftListDom.append(listItemDom);
 	lftDom.append(lftListDom);
 	this.dom.prepend(lftDom);
-	if(this.cfg.selectNum.length > 0){
-		this.initFn(lftDom);
-	}
 }
-selectArea.prototype.setSkinRht = function(){ //绑定数据 左侧
+selectArea.prototype.setSkinRht = function(chk){ //绑定数据 右侧
 	var maxTxt = "";
 	if(this.cfg.max != "" || this.cfg.max > 0){
 		maxTxt = '可选'+ this.cfg.max +'个,';
 	}
-	var rhtDom = '<div class="option-select-lft option-selected">'+
-					'<div class="option-search clearfix">'+ maxTxt +'已选择<span id="selectNum">'+ this.cfg.selectNum.length +'</span>个<a href="javascript:;" class="clear-dom f-r">清空</a></div>'+
-					'<ul class="option-selected-arr"></ul>'+
-				'</div>';
+	var rhtDom = $('<div class="option-select-lft option-selected">'+
+					'<div class="option-search clearfix">'+ maxTxt +'已选择<span id="selectNum">'+ this.cfg.selectArr.length +'</span>个<a href="javascript:;" class="clear-dom f-r">清空</a></div>'+
+				'</div>');
+	var rhtUl = $('<ul class="option-selected-arr"></ul>');
+	rhtDom.append(rhtUl);
 	this.dom.append(rhtDom);
 }
 selectArea.prototype.initFn = function(){ //编辑 初始化
 	var chk = this.dom.find(".option-child-item input[type=checkbox]"),
-		chkp = this.dom.find(".option-item input[type=checkbox]")
+		chkp = this.dom.find(".option-item input[type=checkbox]");
 	var selectArr = this.cfg.selectArr;
 	for(var i=0; i<chk.length; i++){
 		if(selectArr.indexOf(chk.eq(i).val()) > -1){
 			chk.eq(i).attr("checked", true);
-			chk.eq(i).trigger("change");
+			// chk.eq(i).trigger("change");
+			this.dom.find(".option-selected-arr").append('<li data-id="'+ chk.eq(i).val() +'"><span class="f-l">'+ chk.eq(i).siblings('span').text() +'</span><a href="javascript:;" class="close f-r">X</a></li>');
 		}
 	}
 	for(var j=0; j<chkp.length; j++){
 		if(selectArr.indexOf(chkp.eq(j).val()) > -1){
 			chkp.eq(j).attr("checked", true);
-			chkp.eq(j).trigger("change");
+			// chkp.eq(j).trigger("change");
+			this.dom.find(".option-selected-arr").append('<li data-id="'+ chk.eq(j).val() +'"><span class="f-l">'+ chk.eq(j).siblings('span').text() +'</span><a href="javascript:;" class="close f-r">X</a></li>');
 		}
 	}
+	this.callbackFn();
 }
 
 selectArea.prototype.setSkin = function(){
@@ -113,7 +112,8 @@ selectArea.prototype.setSkin = function(){
 
 selectArea.prototype.checkTit = function(){ //checkbox 
 	var _this = this;
-	this.dom.off("change").on("change", ".option-item input[type=checkbox]", function(){ //全选 反选
+	this.dom.find("input[type=checkbox].parent-chk").off("change");
+	this.dom.on("change", "input[type=checkbox].parent-chk", function(){ //全选 反选
 		var self = $(this),
 			sp = self.parents(".option-item"),
 			sib = sp.siblings(".option-child"),
@@ -144,7 +144,8 @@ selectArea.prototype.checkTit = function(){ //checkbox
 
 		_this.callbackFn(); //回调
 	});
-	this.dom.off("change").on("change", ".option-child-item input[type=checkbox]", function(){ //子 选择
+	this.dom.find(".option-child-item > label > input[type=checkbox]").off("change");
+	this.dom.on("change", ".option-child-item > label > input[type=checkbox]", function(){ //子 选择
 		var self = $(this),
 			sp = self.closest(".option-child"),
 			sibLi = sp.find("li.option-child-item"),
@@ -163,15 +164,15 @@ selectArea.prototype.checkTit = function(){ //checkbox
 selectArea.prototype.setSelect = function(chk){ //右侧列表 设置
 	var $sp = chk.parent();
 	if(chk.is(":checked")){
-		if(this.cfg.selectNum.indexOf(chk.val()) > -1){
+		if(this.cfg.selectArr.indexOf(chk.val()) > -1){
 			return false;
 		}
 		if($sp[0].tagName == "P") return;
-		if(!this.setNumFn(this.cfg.selectNum.length+1)){ //是否还可以继续选择
+		if(!this.setNumFn(this.cfg.selectArr.length+1)){ //是否还可以继续选择
 			chk.prop("checked", false);
 			return 'continue';
 		}
-		this.cfg.selectNum.push(chk.val());
+		this.cfg.selectArr.push(chk.val());
 		this.dom.find(".option-selected-arr").append('<li data-id="'+ chk.val() +'"><span class="f-l">'+ chk.siblings('span').text() +'</span><a href="javascript:;" class="close f-r">X</a></li>');
 	}else{
 		this.cancelChked(chk); //右侧删除
@@ -183,13 +184,14 @@ selectArea.prototype.setSelect = function(chk){ //右侧列表 设置
 }
 selectArea.prototype.deleteItem = function(){ //删除
 	var _this = this;
+	this.dom.find(".option-selected-arr .close").off("click");
 	this.dom.on("click", ".option-selected-arr .close", function(){
 		var $li = $(this).parents("li"),
 			id = $li.data("id").toString();
 		var chks = $(this).parents("div.option-select-lft").siblings("div.option-select-lft").find("input:checked");
 		var chkId = 0;
 		$li.remove();
-		_this.cfg.selectNum.splice(_this.cfg.selectNum.indexOf(id), 1);
+		_this.cfg.selectArr.splice(_this.cfg.selectArr.indexOf(id), 1);
 		for(var i=0; i<chks.length; i++){
 			chkId = chks.eq(i).val();
 			if(chkId == id){
@@ -213,7 +215,7 @@ selectArea.prototype.cancelChked = function(dom){ //取消
 			liId = selectedList.eq(i).data("id");
 			if(liId == id){
 				selectedList.eq(i).remove();
-				this.cfg.selectNum.splice(this.cfg.selectNum.indexOf(id), 1);
+				this.cfg.selectArr.splice(this.cfg.selectArr.indexOf(id), 1);
 				break;
 			}
 		}
@@ -222,6 +224,7 @@ selectArea.prototype.cancelChked = function(dom){ //取消
 selectArea.prototype.searchFn = function(){ //搜索
 	var _this = this;
 	var data = _this.cfg.data;
+	_this.dom.find(".search-btn").off("click");
 	_this.dom.on("click", ".search-btn", function(){
 		var searchData = [];
 		var searchChild = [];
@@ -251,7 +254,7 @@ selectArea.prototype.searchFn = function(){ //搜索
 selectArea.prototype.clearAll = function(){ //清空
 	var _this = this;
 	this.dom.on("click", ".clear-dom", function(){
-		_this.cfg.selectNum = [];
+		_this.cfg.selectArr = [];
 		_this.dom.find("input:checked").prop("checked", false);
 		_this.dom.find(".option-selected-arr li").remove();
 
@@ -260,7 +263,7 @@ selectArea.prototype.clearAll = function(){ //清空
 	});
 }
 selectArea.prototype.setNumFn = function(num){ //已选 数字
-	num = num || this.cfg.selectNum.length;
+	num = num || this.cfg.selectArr.length;
 	
 	if(num > parseInt(this.cfg.max) && (this.cfg.max != 0 || this.cfg.max != "")){
 		alert("最多可选"+this.cfg.max+"个");
@@ -270,7 +273,8 @@ selectArea.prototype.setNumFn = function(num){ //已选 数字
 	return true;
 }
 selectArea.prototype.callbackFn = function(){
-	this.callback && this.callback(this.cfg.selectNum); //回调
+	console.log(this.cfg.selectArr,'=====this.cfg.selectArr')
+	this.callback && this.callback(this.cfg.selectArr, this.dom); //回调
 	// console.log(this.cfg.selectNum,'=this.cfg.selectNum======')
 }
 
