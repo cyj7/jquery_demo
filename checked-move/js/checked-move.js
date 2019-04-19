@@ -38,6 +38,15 @@
 		return search;
 	}
 
+	checkedMove.prototype.setListItem = function(data, hasRht) {
+		var str = '<div class="move-item clearfix"><label class="left move-lft" data-desc="' + data.desc + '"><input type="checkbox" value="' +  data.id + '" class="check-item">' + data.title + '</label>';
+		if(hasRht) {
+			str += '<span class="right move-rht">' + data.desc + '</span>';
+		}
+		str += '</div>';
+		return str;
+	}
+
 	checkedMove.prototype.setListSkin = function(dom, tit, data, hasDesc) { //设置左侧节点
 		var chked = this.cfg.selectedVal,
 			originData = this.cfg.data;
@@ -50,20 +59,15 @@
 			header = this.headerSkin(tit, data.length - chked.length);
 			for(var i=0; i<data.length; i++) {
 				if(chked.indexOf(data[i].id) < 0){
-					listHtml += '<div class="move-item clearfix">'+
-								'<label class="left move-lft"><input type="checkbox" value="' +  data[i].id + '" class="check-item">' + data[i].title + '</label>'+
-								'<span class="right move-rht">' + data[i].desc + '</span>'+
-							'</div>';
+					listHtml += this.setListItem(data[i], true);
 				}
 			}
 		} else {
 			header = this.headerSkin(tit, data.length);
 			for(var m=0; m<data.length; m++) {
 				for(var n = 0; n<originData.length; n++) {
-					if(data[m] === originData[n].id){
-						listHtml += '<div class="move-item clearfix">'+
-								'<label class="left move-lft" data-desc="' + originData[n].desc + '"><input type="checkbox" value="' +  data[m] + '" class="check-item">' + originData[n].title + '</label>'+
-							'</div>';
+					if(data[m] == originData[n].id){
+						listHtml += this.setListItem(originData[n]);
 						break;
 					}
 				}
@@ -106,6 +110,7 @@
 		var handle = this.setHandleSkin();
 		this.dom.addClass("checked-move-box clearfix").append(this.lftDom, handle, this.rhtDom);
 		this.checkFn(); //checkbox 事件
+		this.searchFn(); //搜索
 	}
 
 	checkedMove.prototype.callbackFn = function(arr) {
@@ -115,26 +120,32 @@
 	checkedMove.prototype.toRight = function() { //右移
 		var self = this;
 		this.dom.on('click', '.move-handle-right', function(e) {
-			var chked = self.lftDom.find(".move-list input[type=checkbox]:checked"),
+			var chked = self.lftDom.find(".move-item:visible").find("input[type=checkbox]:checked"),
 				lftHeader = self.lftDom.find(".move-tit"),
 				lftNum = lftHeader.find(".total-num");
-			var rhtNum = self.rhtDom.find(".total-num");
+			var rhtNum = self.rhtDom.find(".total-num"),
+				rhtCount = parseInt(rhtNum.text());
 			var curDom = '',
 				curVal = '';
+			if(self.cfg.max != "" && (rhtCount + chked.length) > self.cfg.max) {
+				return alert("最多只能选择"+ self.cfg.max + "项");
+			}
 			var len = parseInt(lftNum.text()) - chked.length;
 			if(chked.length === 0) return alert("您还没有选择商品");
 			lftNum.text(len);
-			rhtNum.text(parseInt(rhtNum.text()) + chked.length);
+			rhtNum.text(rhtCount + chked.length);
 			if(len <= 0){
 				lftHeader.find("input[type=checkbox]").prop("checked", false);
 			}
 			for(var i=0; i<chked.length; i++) {
 				curDom = chked.eq(i).parent();
-				curVal = chked.eq(i).val();
-				// chkArr.push({"id": chked.eq(i).val(), 'title': curDom.text(), 'desc': curDom.siblings("span").text()});
-				self.checkedVal.push(curVal);
-				self.rhtDom.find(".move-list").append('<div class="move-item clearfix"><label class="left move-lft" data-desc="' + curDom.siblings("span").text() + '"><input type="checkbox" value="' +  curVal + '" class="check-item">' + curDom.text() + '</label></div>')
-				curDom.parent().remove();
+				if(curDom.not(":hidden")){
+					curVal = chked.eq(i).val();
+					self.checkedVal.push(curVal);
+					self.rhtDom.find(".move-list").append(self.setListItem({'id': curVal, 'title': curDom.text(), 'desc': curDom.data("desc")}));
+					curDom.parent().remove();
+				}
+				
 			}
 			self.callbackFn(self.checkedVal);
 		});
@@ -158,9 +169,8 @@
 			for(var i=0; i<chked.length; i++) {
 				curDom = chked.eq(i).parent();
 				curVal = chked.eq(i).val();
-				// chkArr.push({"id": chked.eq(i).val(), 'title': curDom.text(), 'desc': curDom.siblings("span").text()});
 				self.checkedVal.splice(self.checkedVal.indexOf(curVal), 1);
-				self.lftDom.find(".move-list").append('<div class="move-item clearfix"><label class="left move-lft"><input type="checkbox" value="' +  curVal + '" class="check-item">' + curDom.text() + '</label><span class="right move-rht">' + curDom.data("desc") + '</span></div>')
+				self.lftDom.find(".move-list").append(self.setListItem({'id': curVal, 'title': curDom.text(), 'desc': curDom.data("desc")}, true));
 				curDom.parent().remove();
 			}
 			self.callbackFn(self.checkedVal);
@@ -171,13 +181,13 @@
 		this.dom.on("change", "input.check-item", function() { //单选
 			var $this = $(this),
 				$list = $this.parents(".move-list"),
-				$chk = $list.find("input.check-item"),
+				$chk = $list.find(".move-item:visible").find("input.check-item"),
 				$chked = $list.find("input.check-item:checked"),
 				$chkAll = $list.siblings(".move-tit").find("input.check-all");
-			if($this.is(":checked") && $chked.length === $chk.length){
+			if($this.is(":checked") && $chked.length === $chk.length) {
 				$chkAll.prop("checked", true);
 			}else{
-				if($chkAll.is(":checked")){
+				if($chkAll.is(":checked")) {
 					$chkAll.prop("checked", false);
 				}
 			}
@@ -187,12 +197,51 @@
 				$tit = $this.parents(".move-tit"),
 				$list = $tit.siblings(".move-list");
 			if($this.is(":checked")) {
-				$list.find("input.check-item").prop("checked", true);
+				$list.find(".move-item:visible input.check-item").prop("checked", true);
 			} else {
 				$list.find("input.check-item").prop("checked", false);
 			}
 		});
 	}
+
+	checkedMove.prototype.searchFn = function() {
+		var search = this.dom.find(".move-search");
+		var self = this;
+		function searchHandle($this, value) {
+			var $search = $this.parents(".move-search"),
+				$list = $search.siblings(".move-list"),
+				$tit = $search.siblings(".move-tit"),
+				listItem = $list.find(".move-item");
+			var data = self.cfg.data;
+			var val = $.trim(value);
+			var html = '';
+			var num = 0;
+			for(var i=0; i<listItem.length; i++) {
+				if(listItem.eq(i).find(".move-lft").text().indexOf(val) < 0){
+					// html += self.setListItem(data[i], true);
+					listItem.eq(i).hide();
+				}else{
+					if(listItem.eq(i).is(":hidden")){
+						listItem.eq(i).show();
+					}
+					num ++;
+				}
+			}
+			// $list.html(html);
+			$tit.find(".total-num").text(num);
+		}
+		search.find(".move-inp").on("keyup", function(e) {
+			if(e.keyCode === 13) {
+				searchHandle($(this), $(this).val());
+			}
+		});
+		search.find(".search-btn").on("click", function(){
+			var $this = $(this),
+				$inp = $this.siblings("input[type=text]");
+			searchHandle($(this), $inp.val());
+		});
+	}
+
 
 	$.fn.extend({
 		moveToRht: function(options) {
