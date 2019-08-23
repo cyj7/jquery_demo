@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		*{margin: 0; padding: 0;}
+		ul, li{ list-style: none; }
+		.idnex-scan .scan-tit{ height: 30px; line-height: 30px; margin: 5px; overflow: hidden; }
+		.idnex-scan .scan-tit span{ cursor: pointer; display: inline-block; padding: 0 5px; border-radius: 4px; height: 30px; overflow: hidden; vertical-align: middle; }
+		.idnex-scan .scan-tit span.option-txt{ max-width:88%; }
+		.idnex-scan .scan-tit span.option-txt:hover{ background: #eaeaea; }
+		.idnex-scan .scan-tit span.option-txt.active,  .idnex-scan .scan-tit span.option-txt.active:hover{ background: #f47837; color: #fff; }
+		.idnex-scan .scan-child{ display: none; }
+		.idnex-scan .show-list{ font-weight: bold; font-size: 30px; width: 30px; text-align: center; }
+		.idnex-scan .scan-menu{ margin-left: 10px; }
+		.idnex-scan .scan-tit .show-list{ position: relative; padding: 0; width: 22px; height: 30px; }
+		.idnex-scan .jia-icon:before, .idnex-scan .jia-icon:after, .idnex-scan .jian-icon:before, .idnex-scan .jian-icon:after{ display: inline-block; content: ""; background: #f47837; position: absolute; }
+		.idnex-scan .jian-icon:before, .idnex-scan .jia-icon:before{ width: 16px; height: 2px; left: 3px; top: 14px; }
+		.idnex-scan .jia-icon:after{ height: 16px; width: 2px; left: 10px; top: 7px; }
+		.idnex-scan .scan-selected .option-txt{ background: #f47837; color: #fff; }
+	</style>
+</head>
+<body>
+	<div class="tree-box idnex-scan"></div>
+	<button class="refresh-tree">刷新</button>
+	<script type="text/javascript" src="../common/jquery-3.1.0.min.js"></script>
+	<script>
+	function treeFn(dom, opt, callback) {
+	    this.dom = $(dom);
+	    this.cfg = $.extend({
+	        data:[],
+	        refresh: false, //是否刷新
+	        select: '' //已选择
+	    }, opt || {});
+	    if (this.cfg.refresh) {
+	        this.dom.empty();
+	    }
+	    this.callback = callback;
+	    this.init();
+	}
+	treeFn.prototype.addChildHtml = function(item) { //添加子节点
+		var selectId = this.cfg.select;
+	    var listItemDom = '<li class="scan-menu">';
+	    var itemChild = item.child; //子菜单data
+	    if(itemChild && itemChild.length > 0){
+	        listItemDom += '<p class="'+ (selectId == item.id ? "scan-tit scan-selected" : "scan-tit")  + '"><span class="show-list jia-icon"></span><span data-id="'+ item.id +'" data-type="'+ item.type +'" class="option-txt">'+ item.name +'</span></p><ul class="scan-child">';
+	        for(var j=0; j<itemChild.length; j++){
+	            listItemDom += this.addChildHtml(itemChild[j]);
+	        }
+	        listItemDom += '</ul>';
+	    }else{
+	        listItemDom += '<p class="'+ (selectId == item.id ? "scan-tit scan-selected" : "scan-tit")  + '"><span class="show-list"></span><span data-id="'+ item.id +'" data-type="'+ item.type +'" class="option-txt">'+ item.name +'</span></p>';
+	    }
+	    listItemDom += '</li>';
+	    return listItemDom;
+	}
+	treeFn.prototype.addHtml = function(){ //添加节点
+	    var data = this.cfg.data;
+	    var lftListDom = $('<ul class="scan-list-dom"></ul>');
+	    var listItemDom = "";
+	    for(var i=0; i<data.length; i++){
+	        listItemDom += this.addChildHtml(data[i]);
+	    }
+	    lftListDom.append(listItemDom);
+	    this.dom.prepend(lftListDom);
+	}
+	treeFn.prototype.titClickFn = function() { //标题点击事件
+		var self = this;
+	    this.dom.off("click", "span.option-txt");
+	    this.dom.on("click", "span.option-txt", function(){
+	    	var $t = $(this),
+	    		id = $t.data("id"),
+	    		type = $t.data("type"),
+	    		name = $t.text();
+	    	self.dom.find(".scan-selected").removeClass("scan-selected");
+	    	$t.parents(".scan-tit").addClass("scan-selected");
+	        self.callback && self.callback(id, name, type);
+	    });
+	}
+	treeFn.prototype.showListFn = function($t) { //展示 or 收起
+    	var $tp = $t.parents(".scan-tit"),
+    		$child = $tp.siblings(".scan-child");
+    	if ($t.hasClass("jia-icon")) {
+    		$t.addClass("jian-icon").removeClass("jia-icon");
+    	} else if($t.hasClass("jian-icon")) {
+    		$t.addClass("jia-icon").removeClass("jian-icon");
+    	}
+    	if($child.is(":hidden")) { //展开
+    		$child.show();
+    	} else {
+    		$child.hide();
+    	}
+	}
+	treeFn.prototype.showClickFn = function(){ //点击展示 or 收起
+		var self = this;
+		this.dom.off("click", "span.show-list");
+	    this.dom.on("click", "span.show-list", function(){
+	    	self.showListFn($(this));
+	    });
+	}
+	treeFn.prototype.ininSelect = function(){
+		var $seled = this.dom.find(".scan-selected"),
+			$li = $seled.parent().parents(".scan-menu");
+		for (var i=0; i<$li.length; i++) {
+			this.showListFn($li.eq(i).children(".scan-tit").children(".show-list"));
+		}
+	}
+
+	treeFn.prototype.init = function() { //初始化
+	    this.addHtml();
+	    this.titClickFn();
+	    this.showClickFn();
+	    if (this.cfg.select) {
+	    	this.ininSelect();
+	    }
+	}
+
+	$.fn.extend({
+	    treeFn: function(opt, callback){
+	        this.each(function(i,dom){
+	            new treeFn(dom, opt, callback);
+	            return this;
+	        });
+	    }
+	});
+	var plist = [
+	    {'id': 1, 'name': 'aaaa', 'type': '计划', child: [
+	        {'id': 11, 'name': 'aaaa1', 'type': '组'},
+	        {'id': 12, 'name': 'aaaa2', 'type': '组'}
+	    ]},
+	    {'id': 2, 'name': 'bbbb', 'type': '计划'},
+	    {'id': 3, 'name': 'cccc', 'type': '计划', child: [
+	        {'id': 31, 'name': 'cccc1', 'type': '组'},
+	        {'id': 32, 'name': 'cccc2', 'type': '组', 'child': [
+	            {'id': 321, 'name': 'cccc21', 'type': '创意'}
+	        ]}
+	    ]}
+	]
+	$(".tree-box").treeFn({
+		data: plist,
+		select: 32
+	}, function(id, name, type){
+		console.log(id, '============')
+	});
+	$(".refresh-tree").on("click", function(){ //刷新
+		var list = [
+		    {'id': 1, 'name': 'aaaa', 'type': '计划', child: [
+		        {'id': 11, 'name': 'aaaa1', 'type': '组'},
+		        {'id': 12, 'name': 'aaaa2', 'type': '组'}
+		    ]},
+		    {'id': 2, 'name': 'bbbb', 'type': '计划'}
+		]
+		$(".tree-box").treeFn({
+			data: list,
+			refresh: true,
+			select: 2
+		}, function(id, name, type){
+			console.log(id, '============')
+		});
+	})
+	</script>
+</body>
+</html>

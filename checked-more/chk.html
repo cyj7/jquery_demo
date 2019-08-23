@@ -29,6 +29,7 @@
 	</style>
 </head>
 <body class="white-bg">
+	<button onclick="refresh()">刷新</button>
 	<div class="select-body clearfix option-select-main">
 		<!-- <div class="option-select-lft">
 			<div class="option-search">
@@ -63,12 +64,12 @@
 			</ul>
 		</div> -->
 	</div>
-	<div class="area-body"></div>
+	<!-- <div class="area-body"></div> -->
 	<script src="../common/jquery-3.1.0.min.js" type="text/javascript"></script>
 	<script src="./js/select-area.js" type="text/javascript"></script>
 	<script>
-		$(function(){
-			var app = [
+			function refresh() {
+				var app = [
 				{'id': 1, 'title': '黑龙江', 'children': [{'id': 11, 'title': '哈尔滨'}, {'id': 12, 'title': '齐齐哈尔'}, {'id': 13, 'title': '鸡西'}, {'id': 14, 'title': '鹤岗'}, {'id': 15, 'title': '双鸭山'}, {'id': 16, 'title': '大庆1'}]},
 				{'id': 2, 'title': '黑龙江', 
 				'children': [{'id': 21, 'title': '哈尔滨', 
@@ -77,27 +78,15 @@
 					{'id': 23, 'title': '鸡西'}
 					]}, {'id': 25, 'title': '双鸭山'}, {'id': 26, 'title': '大庆2'}, {'id': 27, 'title': '大庆大'}]}
 			];
-			var area = [
-				{'id': 1, 'title': '黑龙江', 'children': [{'id': 11, 'title': '哈尔滨'}, {'id': 12, 'title': '齐齐哈尔'}, {'id': 13, 'title': '鸡西'}, {'id': 14, 'title': '鹤岗'}, {'id': 15, 'title': '双鸭山'}, {'id': 16, 'title': '大庆1'}]},
-				{'id': 2, 'title': '黑龙江', 
-				'children': [{'id': 21, 'title': '哈尔滨'}, {'id': 25, 'title': '双鸭山'}, {'id': 26, 'title': '大庆2'}, {'id': 27, 'title': '大庆大'}]}
-			];
-			$(".select-body").selectArea({
-				'data': app,
-				'max': 10,
-				'selectArr': ['11','22']
-			}, function(num){
-				console.log(num,'=======num')
-			});
-
-			$(".area-body").selectArea({
-				'data': area,
-				'max': 10,
-				'selectArr': ['11','21']
-			}, function(num){
-				console.log(num,'=======num')
-			});
-		});
+				$(".select-body").selectArea({
+					'data': app,
+					'max': 10,
+					'selectArr': ['11']
+				}, function(num){
+					console.log(num,'=======num')
+				});
+			}
+		
 	</script>
 </body>
 </html>
