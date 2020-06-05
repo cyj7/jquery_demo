@@ -15,10 +15,13 @@
 		.idnex-scan .show-list{ font-weight: bold; font-size: 30px; width: 30px; text-align: center; }
 		.idnex-scan .scan-menu{ margin-left: 10px; }
 		.idnex-scan .scan-tit .show-list{ position: relative; padding: 0; width: 22px; height: 30px; }
-		.idnex-scan .jia-icon:before, .idnex-scan .jia-icon:after, .idnex-scan .jian-icon:before, .idnex-scan .jian-icon:after{ display: inline-block; content: ""; background: #f47837; position: absolute; }
-		.idnex-scan .jian-icon:before, .idnex-scan .jia-icon:before{ width: 16px; height: 2px; left: 3px; top: 14px; }
+		.idnex-scan .jia-icon:before, .idnex-scan .jia-icon:after,
+		.tree-show > .scan-tit > .jia-icon:before, .tree-show > .scan-tit > .jia-icon:after{ display: inline-block; content: ""; background: #f47837; position: absolute; }
+		.tree-show > .scan-tit > .jia-icon:before, .idnex-scan .jia-icon:before{ width: 16px; height: 2px; left: 3px; top: 14px; }
 		.idnex-scan .jia-icon:after{ height: 16px; width: 2px; left: 10px; top: 7px; }
+		.tree-show > .scan-tit > .jia-icon:after{ display: none; }
 		.idnex-scan .scan-selected .option-txt{ background: #f47837; color: #fff; }
+		.tree-show > .scan-child{ display: block; }
 	</style>
 </head>
 <body>
@@ -31,7 +34,8 @@
 	    this.cfg = $.extend({
 	        data:[],
 	        refresh: false, //是否刷新
-	        select: '' //已选择
+	        select: '', //已选择
+	        show: false //是否初始化显示全部菜单
 	    }, opt || {});
 	    if (this.cfg.refresh) {
 	        this.dom.empty();
@@ -41,7 +45,11 @@
 	}
 	treeFn.prototype.addChildHtml = function(item) { //添加子节点
 		var selectId = this.cfg.select;
-	    var listItemDom = '<li class="scan-menu">';
+		var liClass = "scan-menu";
+		if (this.cfg.show) {
+			liClass = "scan-menu tree-show";
+		}
+	    var listItemDom = '<li class="'+ liClass +'">';
 	    var itemChild = item.child; //子菜单data
 	    if(itemChild && itemChild.length > 0){
 	        listItemDom += '<p class="'+ (selectId == item.id ? "scan-tit scan-selected" : "scan-tit")  + '"><span class="show-list jia-icon"></span><span data-id="'+ item.id +'" data-type="'+ item.type +'" class="option-txt">'+ item.name +'</span></p><ul class="scan-child">';
@@ -79,18 +87,24 @@
 	    });
 	}
 	treeFn.prototype.showListFn = function($t) { //展示 or 收起
-    	var $tp = $t.parents(".scan-tit"),
-    		$child = $tp.siblings(".scan-child");
-    	if ($t.hasClass("jia-icon")) {
-    		$t.addClass("jian-icon").removeClass("jia-icon");
-    	} else if($t.hasClass("jian-icon")) {
-    		$t.addClass("jia-icon").removeClass("jian-icon");
-    	}
-    	if($child.is(":hidden")) { //展开
-    		$child.show();
-    	} else {
-    		$child.hide();
-    	}
+    	// var $tp = $t.parents(".scan-tit"),
+    	// 	$child = $tp.siblings(".scan-child");
+    	// if ($t.hasClass("jia-icon")) {
+    	// 	$t.addClass("jian-icon").removeClass("jia-icon");
+    	// } else if($t.hasClass("jian-icon")) {
+    	// 	$t.addClass("jia-icon").removeClass("jian-icon");
+    	// }
+    	// if($child.is(":hidden")) { //展开
+    	// 	$child.show();
+    	// } else {
+    	// 	$child.hide();
+    	// }
+    	var $tp = $t.closest(".scan-menu");
+		if ($tp.hasClass("tree-show")) {
+			$tp.removeClass("tree-show");
+		} else {
+			$tp.addClass("tree-show");
+		}
 	}
 	treeFn.prototype.showClickFn = function(){ //点击展示 or 收起
 		var self = this;
@@ -139,7 +153,8 @@
 	]
 	$(".tree-box").treeFn({
 		data: plist,
-		select: 32
+		// select: 32
+		show: true
 	}, function(id, name, type){
 		console.log(id, '============')
 	});
