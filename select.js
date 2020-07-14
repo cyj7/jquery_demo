@@ -1,4 +1,4 @@
-//创建节点
+//创建节点 
 function selectFun(dom,opt){
     var $dom = $(dom);
     var dtw = this.dtw = $dom.outerWidth();//宽度
